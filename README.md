@@ -1,9 +1,8 @@
-# pocketcasts-batch
-### _Your Name <your.name@example.com>_
+Bulk Operations Pocket Casts
+---
 
-This is a project to do ... something.
+This tool makes it dead easy to perform bulk actions - subscribing and unsubscribing to podcasts - with Pocket Casts.
 
 ## License
 
-Specify license here
-
+GPL+V3
