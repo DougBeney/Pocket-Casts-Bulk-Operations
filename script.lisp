@@ -13,17 +13,17 @@
   `(let ((status (if ,visible
                      "inherit"
                      "none")))
-     (console.log "visibile is" ,visible)
-
-     ((@ ,item css) "display" status)
-     ))
+     ((@ ,item css) "display" status)))
 
 (defmacro $append (sel item)
   `($prop ($ ,sel) "append" ,item))
 
 (defmacro $click (item &body body)
-  `($prop ,item "click"
-          (lambda () ,@body)))
+  `((@ ,item click) (lambda () ,@body)))
+
+;; (defmacro $click (item &body body)
+;;   `($prop ,item "click"
+;;           (lambda () ,@body)))
 
 (defmacro template-html (name)
   `($prop ($ ,(concatenate 'string
@@ -46,9 +46,32 @@
                       "\"}")
             "success" (lambda (data status xhr)
                         (setf (@ local-storage token)
-                              (@ data "token")))
+                              (@ data "token"))
+                        (adjust-visibility)
+                        (update-podcasts))
             "error" (lambda (jqXhr textStatus errorMessage)
-                      (console.log "FAIL" errorMessage)))))
+                      ((@ ($ "#auth-error") html) "Incorrect login credentials. Please try harder.")
+                      ($display ($ "#auth-error") t)
+                      (chain console (log "FAIL" errorMessage))))))
+
+(defun login-form-submit ()
+  (when (or (not ((@ ($ "#email") val)))
+            (not ((@ ($ "#password") val))))
+    ((@ ($ "#auth-error") html) "Please fill out both your username and password.")
+    ($display ($ "#auth-error") t)
+    (return))
+
+  (let ((email ((@ ($ "#email") val)))
+        (password ((@ ($ "#password") val))))
+    ($display ($ "#auth-error") nil)
+
+    (login email
+           password)
+
+    ((@ ($ "#email") val) "")
+    ((@ ($ "#password") val) "")
+    ((chain ($ "#email") (parent) "removeClass") "is-dirty")
+    ((chain ($ "#password") (parent) "removeClass") "is-dirty")))
 
 (defun thumbnail-url (uuid)
   (concatenate 'string
@@ -89,32 +112,61 @@
 (defun update-podcasts ()
   (when (@ local-storage token)
     (clear-podcasts-list)
-    ($.ajax (create
-             "method" "POST"
-             "contentType" "application/json"
-             "url" "https://api.pocketcasts.com/user/podcast/list"
-             "data" "{ \"v\": 1 }"
-             "beforeSend" (lambda (xhr)
-                            ((@ xhr "setRequestHeader")
-                             "Authorization"
-                             (+ "Bearer "
-                                (@ local-storage token))))
+    (chain $ (ajax (create
+                    "method" "POST"
+                    "contentType" "application/json"
+                    "url" "https://api.pocketcasts.com/user/podcast/list"
+                    "data" "{ \"v\": 1 }"
+                    "beforeSend" (lambda (xhr)
+                                   ((@ xhr "setRequestHeader")
+                                    "Authorization"
+                                    (+ "Bearer "
+                                       (@ local-storage token))))
 
-             "success" (lambda (data status xhr)
-                         (let ((podcasts (@ data podcasts)))
-                           (setq *your-podcasts* podcasts)
-                           (for-in (i podcasts)
-                                   (let* ((id i)
-                                          (podcast (elt podcasts i))
-                                          (name (@ podcast title))
-                                          (thumb (thumbnail-url (@ podcast uuid))))
-                                     (add-podcast id
-                                                  name
-                                                  thumb)))))
+                    "success" (lambda (data status xhr)
+                                (let ((podcasts (@ data podcasts)))
+                                  (setq *your-podcasts* podcasts)
+                                  (for-in (i podcasts)
+                                          (let* ((id i)
+                                                 (podcast (elt podcasts i))
+                                                 (name (@ podcast title))
+                                                 (thumb (thumbnail-url (@ podcast uuid))))
+                                            (add-podcast id
+                                                         name
+                                                         thumb)))))
 
 
-             "error" (lambda (jqXhr textStatus errorMessage)
-                       (console.log "FAIL" errorMessage))))))
+                    "error" (lambda (jqXhr textStatus errorMessage)
+                              (chain console (log "FAIL" errorMessage))))))))
 
 ($init (update-podcasts)
-       (adjust-visibility))
+       (adjust-visibility)
+
+       ($click ($ "#login-button")
+               (login-form-submit))
+
+       (chain ($ "#email, #password")
+              (keypress
+               (lambda (e)
+                 (when (eq (@ e which) 13)
+                   (login-form-submit)))))
+
+       ($click ($ "#logout-button")
+               ((@ local-storage "removeItem") "token")
+               (adjust-visibility))
+
+       ($click ($ "#select-all-podcasts-container")
+               (var is-checked
+                    (not (chain ($ this) (has-class "is-checked"))))
+
+               (let ((podcasts (chain ($ "#podcast-list")
+                                      (find "li")
+                                      (to-array))))
+
+                 (loop for podcast in podcasts do
+                      (let ((podcast-checkbox
+                             (chain ($ podcast) (find "#podcast-checkbox-container"))))
+                        (if is-checked
+                            (chain podcast-checkbox (add-class "is-checked"))
+                            (chain podcast-checkbox (remove-class "is-checked")))
+                        )))))

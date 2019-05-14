@@ -82,6 +82,12 @@
           #podcast-unsubscribe-all-button {
               display: none;
           }
+
+          #auth-error {
+              display: none;
+              color: #f41853;
+              margin: 0;
+          }
         </style>
   </head>
   <body>
@@ -104,7 +110,8 @@
               </div>
               <iframe width="1280" height="320" src="https://www.youtube.com/embed/xna-kdXZQHQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
               <div class="mdl-card__supporting-text">
-                <form action="#">
+                <p id="auth-error">Incorrect password!</p>
+                <form action="#" onsubmit="console.log(\"HELLO WORLD!\")">
                   <div class="mdl-textfield mdl-js-textfield">
                     <input class="mdl-textfield__input" type="text" id="email" />
                     <label class="mdl-textfield__label" for="email">Email</label>
@@ -116,7 +123,7 @@
                 </form>
               </div>
               <div class="mdl-card__actions mdl-card--border">
-                <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Log in</button>
+                <button id="login-button" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Log in</button>
               </div>
             </div>
 
@@ -129,8 +136,8 @@
                 <li class="mdl-list__item">
                   <meta name="podcast-id" value="-1"/>
                   <span class="mdl-list__item-secondary-action">
-                    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="list-checkbox-1">
-                      <input type="checkbox" id="podcast-checkbox list-checkbox-1" class="mdl-checkbox__input" />
+                    <label id="podcast-checkbox-container" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="podcast-checkbox">
+                      <input type="checkbox" id="podcast-checkbox" class="mdl-checkbox__input" />
                     </label>
                   </span>
                   <span class="mdl-list__item-secondary-action">
@@ -140,7 +147,7 @@
                   </span>
                   <span class="mdl-list__item-primary-content">
                     <img class="podcast-thumbnail material-icons  mdl-list__item-avatar" />
-                    <span class="podcast-name">yo</span>
+                    <span class="podcast-name">Podcast Name</span>
                   </span>
                 </li>
               </div>
@@ -148,8 +155,8 @@
 
             <li style="display: none" id="bulk-header" class="mdl-list__item">
               <span class="mdl-list__item-secondary-action">
-                <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="list-checkbox-1">
-                  <input type="checkbox" id="podcast-checkbox list-checkbox-1" class="mdl-checkbox__input" />
+                <label id="select-all-podcasts-container" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="select-all-podcasts">
+                  <input id="select-all-podcasts" type="checkbox" class="mdl-checkbox__input" />
                 </label>
               </span>
               <span class="mdl-list__item-secondary-action">
@@ -162,7 +169,7 @@
             <hr id="header-sep" style="display: none"/>
 
             <ul id="podcast-list" class="mdl-list">
-
+              <!-- List of Podcasts -->
             </ul>
 
           </div>
