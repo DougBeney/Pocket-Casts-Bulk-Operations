@@ -83,13 +83,21 @@
   ((@ ($ "#podcast-list") html) ""))
 
 (defun add-podcast (&optional
-                      (id -1)
+                      (uuid -1)
                       (name "Untitled Podcast")
                       (thumbnail "https://placekitten.com/50/50"))
   (let ((new-item ($ "<div>")))
     ($prop new-item "html" (template-html "list-item"))
     ((@ new-item "appendTo") ($ "#podcast-list"))
-    ($attr ($prop new-item "find" "meta[name='podcast-id']") "value" id)
+    ($attr ($prop new-item "find" "meta[name='podcast-id']") "value" uuid)
+    ($attr ($prop new-item "find" "#podcast-checkbox-container") "for" (concatenate 'string
+                                                                                    "podcast-"
+                                                                                    uuid
+                                                                                    "-checkbox"))
+    ($attr ($prop new-item "find" "#podcast-checkbox") "id" (concatenate 'string
+                                                                          "podcast-"
+                                                                          uuid
+                                                                          "-checkbox"))
     ($prop ($prop new-item "find" ".podcast-name") "html" name)
     ($attr ($prop new-item "find" ".podcast-thumbnail") "src" thumbnail)
     new-item))
@@ -109,35 +117,103 @@
         ($display ($ "#bulk-header") nil)
         ($display ($ "#header-sep") nil))))
 
-(defun update-podcasts ()
+(defun get-selected-podcasts ()
+  (loop for ticked in
+       (chain ($ "#podcast-list") (find ".is-checked") (to-array))
+       collect (chain ($ ticked) (parent) (parent))))
+
+(defun event--checkbox-ticked ()
+  (let ((podcasts-checked (chain ($ "#podcast-list") (find ".is-checked") (to-array) length)))
+    (if (> podcasts-checked 0)
+        (chain ($ "#mass-actions") (show))
+        (chain ($ "#mass-actions") (hide)))))
+
+(defun api-request (url &key
+                          (method "GET")
+                          (data (create))
+                          (success (lambda (data status xhr)))
+                          (error (lambda (jqXhr textStatus errorMessage))))
   (when (@ local-storage token)
-    (clear-podcasts-list)
+    (setf (@ data "v") 1)
     (chain $ (ajax (create
-                    "method" "POST"
+                    "method" method
                     "contentType" "application/json"
-                    "url" "https://api.pocketcasts.com/user/podcast/list"
-                    "data" "{ \"v\": 1 }"
+                    "url" url
+                    "data" (chain *json* (stringify data))
                     "beforeSend" (lambda (xhr)
                                    ((@ xhr "setRequestHeader")
                                     "Authorization"
                                     (+ "Bearer "
                                        (@ local-storage token))))
 
-                    "success" (lambda (data status xhr)
-                                (let ((podcasts (@ data podcasts)))
-                                  (setq *your-podcasts* podcasts)
-                                  (for-in (i podcasts)
-                                          (let* ((id i)
-                                                 (podcast (elt podcasts i))
-                                                 (name (@ podcast title))
-                                                 (thumb (thumbnail-url (@ podcast uuid))))
-                                            (add-podcast id
-                                                         name
-                                                         thumb)))))
+                    "success" success
+                    "error" error)))))
+
+(defun update-podcasts ()
+  (clear-podcasts-list)
+  (api-request "https://api.pocketcasts.com/user/podcast/list"
+               :method "POST"
+               :success (lambda (data status xhr)
+                          (let ((podcasts (@ data podcasts)))
+                            (setq *your-podcasts* podcasts)
+                            (for-in (i podcasts)
+                                    (let* ((podcast (elt podcasts i))
+                                           (uuid (@ podcast uuid))
+                                           (name (@ podcast title))
+                                           (thumb (thumbnail-url (@ podcast uuid))))
+                                      (add-podcast uuid
+                                                   name
+                                                   thumb)))
+
+                            ;;; Unsubscribe button clicked
+                            ($click ($ ".podcast-subscribe-button")
+                                    (let ((unsubscribe-action (chain ($ this) (has-class "mdl-button--accent")))
+                                          (uuid (chain ($ this) (parent) (parent) (find "meta[name='podcast-id']") (attr "value"))))
+                                      (if unsubscribe-action
+                                          (unsubscribe-podcast uuid)
+                                          (subscribe-podcast uuid))
+                                      ))
+
+                            ;;; Checkbox event
+                            (chain ($ ".mdl-checkbox") (change
+                                                        (lambda ()
+                                                          (event--checkbox-ticked))))))
 
 
-                    "error" (lambda (jqXhr textStatus errorMessage)
-                              (chain console (log "FAIL" errorMessage))))))))
+               :error (lambda (jqXhr textStatus errorMessage)
+                        (chain console (log "FAIL" errorMessage)))))
+
+(defun update-sub-button-state (subscribed uuid)
+  (loop for li in (chain ($ "#podcast-list") (find "li") (to-array)) do
+       (let ((cur-uuid (chain ($ li) (find "meta[name='podcast-id']") (attr "value"))))
+         (when (eq cur-uuid uuid)
+           (if subscribed
+               (progn
+                 (chain ($ li) (find ".podcast-subscribe-button") (text "Unsubscribe"))
+                 (chain ($ li) (find ".podcast-subscribe-button") (add-class "mdl-button--accent")))
+               (progn
+                 (chain ($ li) (find ".podcast-subscribe-button") (text "Subscribe"))
+                 (chain ($ li) (find ".podcast-subscribe-button") (remove-class "mdl-button--accent"))))
+           ))))
+
+(defun unsubscribe-podcast (uuid)
+  (api-request "https://api.pocketcasts.com/user/podcast/unsubscribe"
+               :method "POST"
+               :data (create "uuid" uuid)
+               :success (lambda (data status xhr)
+                          (update-sub-button-state nil uuid))
+               :error (lambda (jqXhr textStatus errorMessage)
+                        (chain console (log "FAILURE to del")))))
+
+(defun subscribe-podcast (uuid)
+  (api-request "https://api.pocketcasts.com/user/podcast/subscribe"
+               :method "POST"
+               :data (create "uuid" uuid)
+               :success (lambda (data status xhr)
+                          (update-sub-button-state t uuid))
+               :error (lambda (jqXhr textStatus errorMessage)
+                        (chain console (log "FAILURE to del")))))
+
 
 ($init (update-podcasts)
        (adjust-visibility)
@@ -165,8 +241,18 @@
 
                  (loop for podcast in podcasts do
                       (let ((podcast-checkbox
-                             (chain ($ podcast) (find "#podcast-checkbox-container"))))
+                             (chain ($ podcast)
+                                    (find "#podcast-checkbox-container"))))
                         (if is-checked
                             (chain podcast-checkbox (add-class "is-checked"))
-                            (chain podcast-checkbox (remove-class "is-checked")))
-                        )))))
+                            (chain podcast-checkbox (remove-class "is-checked")))))))
+
+       ($click ($ "#podcast-unsubscribe-selected-button")
+               (loop for podcast in (get-selected-podcasts)
+                  do (unsubscribe-podcast
+                      (chain ($ podcast) (find "meta[name='podcast-id']") (attr "value")))))
+
+       ($click ($ "#podcast-subscribe-selected-button")
+               (loop for podcast in (get-selected-podcasts)
+                  do (subscribe-podcast
+                      (chain ($ podcast) (find "meta[name='podcast-id']") (attr "value"))))))
