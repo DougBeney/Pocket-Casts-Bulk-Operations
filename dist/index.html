@@ -47,149 +47,207 @@
 
     <link rel="shortcut icon" href="images/favicon.png">
 
-    <!-- SEO: If your mobile URL is different from the desktop URL, add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones -->
-    <!--
-        <link rel="canonical" href="http://www.example.com/">
-        -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.teal-red.min.css">
-        <link rel="stylesheet" href="demo-styles.css">
-        <style>
-          #view-source {
-              position: fixed;
-              display: block;
-              right: 0;
-              bottom: 0;
-              margin-right: 40px;
-              margin-bottom: 40px;
-              z-index: 900;
-          }
-          .mdl-textfield__label {
+    <!--Import materialize.css-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 
-              color: #757575 !important;
-          }
+    <!-- <link rel="stylesheet" href="demo-styles.css"> -->
+    <style>
+      body {
+          background-color: #fff;
+      }
 
-          .podcast-subscribe-button {
-              margin: 0 15px;
-          }
+      #header {
+          background-color: #f43e37;
+          color: #fff;
+          display: inline-block;
+          width: 100%;
+          padding: 15px 15px 100px 15px;
+          z-index: -1;
+      }
 
-          hr#header-sep {
-              margin: 0
-          }
+      #header-container {
+          max-width: 900px;
+          margin: 0 auto;
+      }
 
-          #auth-error {
-              display: none;
-              color: #f41853;
-              margin: 0;
-          }
-        </style>
+      #document {
+          display: block;
+          position: relative;
+          padding: 40px 15px;
+          margin: 40px auto;
+          margin-top: -80px;
+          z-index: 1;
+          background-color: #fff;
+          min-height: 400px;
+          max-width: 1000px;
+          width: 100%;
+      }
+
+      span#checkbox-span {
+          margin: 0 !important;
+          margin-bottom: -10px !important;
+      }
+
+      #login-box {
+          display: block;
+          padding: 15px;
+          background-color: #fff;
+          max-width: 750px;
+          color: #242424;
+      }
+
+      #login-box h3 {
+          margin: 0;
+          font-size: 1.5em;
+          font-weight: bold;
+      }
+
+      #mass-actions {
+          opacity: 0;
+          transition: 150ms ease-in;
+      }
+
+      #actions {
+          min-height: 36px;
+      }
+
+      #auth-error {
+          display: none;
+          color: #f41853;
+          margin-top: 10px;
+      }
+
+      #header-sep {
+          color: #ccc;
+      }
+
+      .podcast-thumbnail {
+          width: 50px;
+          height: 50px;
+          vertical-align: middle;
+          border-radius: 999px;
+          margin: 0 30px;
+      }
+
+      #view-source {
+          position: fixed;
+          display: block;
+          right: 0;
+          bottom: 0;
+          margin-right: 40px;
+          margin-bottom: 40px;
+          z-index: 900;
+      }
+    </style>
   </head>
   <body>
-    <div class="demo-layout mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">
-      <div class="demo-ribbon"></div>
-      <main class="demo-main mdl-layout__content">
-        <div class="demo-container mdl-grid">
-          <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
-          <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
-            <h3>Pocket Casts Bulk Operations Tool</h3>
-            <p>
-              This tool makes it dead easy to perform bulk actions - subscribing and unsubscribing to podcasts - with Pocket Casts.
-            </p>
-            <p>This is a <strong>third-party</strong> tool and not created or endorsed by the Pocket Casts team. All source code of this tool is freely availible for you to evaluate and audit on your own.</p>
+
+    <div id="header">
+      <div id="header-container">
+        <h3>Pocket Casts Bulk Operations Tool</h3>
+        <p>
+          This tool makes it dead easy to perform bulk actions - subscribing and unsubscribing to podcasts - with Pocket Casts.
+        </p>
+        <p>This is a <strong>third-party</strong> tool and not created or endorsed by the Pocket Casts team. All source code of this tool is freely availible for you to evaluate and audit on your own.</p>
 
 
-            <div id="login-box" class="mdl-card mdl-shadow--3dp" style="width: 100%">
-              <div class="mdl-card__title mdl-color--primary mdl-color-text--white" style="background-color: #F43E37 !important;">
-                <h2 class="mdl-card__title-text">Login to your PocketCasts.com account</h2>
-              </div>
-              <div class="mdl-card__supporting-text">
-                <p id="auth-error">Incorrect password!</p>
-                <form action="#" onsubmit="console.log(\"HELLO WORLD!\")">
-                  <div class="mdl-textfield mdl-js-textfield">
-                    <input class="mdl-textfield__input" type="text" id="email" />
-                    <label class="mdl-textfield__label" for="email">Email</label>
-                  </div>
-                  <div class="mdl-textfield mdl-js-textfield">
-                    <input class="mdl-textfield__input" type="password" id="password" />
-                    <label class="mdl-textfield__label" for="password">Password</label>
-                  </div>
-                </form>
-              </div>
-              <div class="mdl-card__actions mdl-card--border">
-                <button id="login-button" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Log in</button>
-              </div>
+
+        <div id="login-box" class="mdl-card mdl-shadow--3dp" style="width: 100%">
+
+          <h3>Login to your PocketCasts.com account</h3>
+
+          <p id="auth-error">Incorrect password!</p>
+
+          <form action="#" onsubmit="console.log(\"HELLO WORLD!\")">
+            <div class="input-field">
+              <input class="validate" type="text" id="email" />
+              <label for="email">Email</label>
             </div>
+            <div class="input-field">
+              <input class="validate" type="password" id="password" />
+              <label for="password">Password</label>
+            </div>
+          </form>
 
-            <button style="display: none" id="logout-button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
-              Logout
+          <button id="login-button" class="btn-large waves-effect waves-light">Log in</button>
+
+        </div>
+
+        <button style="display: none; color: #242424;" id="logout-button" class="waves-effect waves-light btn white">
+          Logout
+        </button>
+
+      </div>
+    </div>
+
+    <div id="document" class="z-depth-5">
+
+      <templates style="display: none">
+        <div id="TEMPLATE_list-item">
+          <div class="row">
+            <meta name="podcast-id" value="-1"/>
+            <label>
+              <input class="filled-in" type="checkbox" id="podcast-checkbox" />
+              <span id="checkbox-span"></span>
+            </label>
+
+            <button class="podcast-subscribe-button unsub waves-effect waves-light btn red">
+              Unsubscribe
             </button>
 
-            <templates style="display: none;">
-              <div id="TEMPLATE_list-item">
-                <li class="mdl-list__item">
-                  <meta name="podcast-id" value="-1"/>
-                  <span class="mdl-list__item-secondary-action">
-                    <label id="podcast-checkbox-container" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="podcast-checkbox">
-                      <input type="checkbox" id="podcast-checkbox" class="mdl-checkbox__input" />
-                    </label>
-                  </span>
-                  <span class="mdl-list__item-secondary-action">
-                    <button class="podcast-subscribe-button mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
-                      Unsubscribe
-                    </button>
-                  </span>
-                  <span class="mdl-list__item-primary-content">
-                    <img class="podcast-thumbnail material-icons  mdl-list__item-avatar" />
-                    <span class="podcast-name">Podcast Name</span>
-                  </span>
-                </li>
-              </div>
-            </templates>
-
-            <li class="mdl-list__item">
-              <span class="mdl-list__item-secondary-action">
-                <label id="select-all-podcasts-container" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="select-all-podcasts">
-                  <input id="select-all-podcasts" type="checkbox" id="podcast-checkbox" class="mdl-checkbox__input" />
-                </label>
-              </span>
-              <span id="mass-actions" class="mdl-list__item-secondary-action" style="display: none">
-                <button id="podcast-unsubscribe-selected-button" class="podcast-subscribe-button mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
-                  Unsubscribe Selected
-                </button>
-                <button id="podcast-subscribe-selected-button" class="podcast-subscribe-button mdl-button mdl-js-button mdl-button--raised">
-                  Subscribe Selected
-                </button>
-              </span>
-            </li>
-
-            <hr id="header-sep" style="display: none"/>
-
-            <ul id="podcast-list" class="mdl-list">
-              <!-- List of Podcasts -->
-            </ul>
-
+            <img class="podcast-thumbnail material-icons  mdl-list__item-avatar" />
+            <span class="podcast-name">Podcast Name</span>
           </div>
         </div>
-        <footer class="demo-footer mdl-mini-footer">
-          <div class="mdl-mini-footer--left-section">
-            <ul class="mdl-mini-footer--link-list">
-              <li><a href="https://dougie.io/contact">Contact</a></li>
-              <li><a href="https://github.com/DougBeney/Pocket-Casts-Bulk-Operations">Source Code</a></li>
-            </ul>
-          </div>
-        </footer>
-      </main>
-    </div>
-    <a href="https://github.com/DougBeney/Pocket-Casts-Bulk-Operations" target="_blank" id="view-source" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--accent mdl-color-text--accent-contrast">View Source</a>
+      </templates>
 
-    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+      <div class="row" id="actions">
+        <label>
+          <input class="filled-in" id="select-all-podcasts" type="checkbox" />
+          <span id="checkbox-span"></span>
+        </label>
+
+        <span id="mass-actions" style="min-height: 36px; min-width: 5px;">
+          <button id="podcast-unsubscribe-selected-button" class="waves-effect waves-light btn red" style="margin-right: 15px;">
+            Unsubscribe Selected
+          </button>
+
+          <button id="podcast-subscribe-selected-button" class="waves-effect waves-light btn">
+            Subscribe Selected
+          </button>
+        </span>
+
+      </div>
+
+      <hr id="header-sep" style="display: none"/>
+
+      <ul id="podcast-list" class="mdl-list">
+        <!-- List of Podcasts -->
+      </ul>
+    </div>
+
+    <footer class="demo-footer mdl-mini-footer">
+      <div class="mdl-mini-footer--left-section">
+        <ul class="mdl-mini-footer--link-list">
+          <li><a href="https://dougie.io/contact">Contact</a></li>
+          <li><a href="https://github.com/DougBeney/Pocket-Casts-Bulk-Operations">Source Code</a></li>
+        </ul>
+      </div>
+    </footer>
+
+    <a href="https://github.com/DougBeney/Pocket-Casts-Bulk-Operations" target="_blank" id="view-source" class="waves-effect waves-light btn">View Source</a>
+
+
     <script
       src="https://code.jquery.com/jquery-3.4.1.min.js"
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
       crossorigin="anonymous"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="script.js"></script>
+
   </body>
 </html>

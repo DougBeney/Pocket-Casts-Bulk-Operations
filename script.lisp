@@ -100,6 +100,7 @@
                                                                           "-checkbox"))
     ($prop ($prop new-item "find" ".podcast-name") "html" name)
     ($attr ($prop new-item "find" ".podcast-thumbnail") "src" thumbnail)
+
     new-item))
 
 (defun adjust-visibility ()
@@ -119,14 +120,14 @@
 
 (defun get-selected-podcasts ()
   (loop for ticked in
-       (chain ($ "#podcast-list") (find ".is-checked") (to-array))
+       (chain ($ "#podcast-list") (find "input:checked") (to-array))
        collect (chain ($ ticked) (parent) (parent))))
 
 (defun event--checkbox-ticked ()
-  (let ((podcasts-checked (chain ($ "#podcast-list") (find ".is-checked") (to-array) length)))
+  (let ((podcasts-checked (chain ($ "#podcast-list") (find "input:checked") (to-array) length)))
     (if (> podcasts-checked 0)
-        (chain ($ "#mass-actions") (show))
-        (chain ($ "#mass-actions") (hide)))))
+        (chain ($ "#mass-actions") (css "opacity" "1"))
+        (chain ($ "#mass-actions") (css "opacity" "0")))))
 
 (defun api-request (url &key
                           (method "GET")
@@ -167,7 +168,7 @@
 
                             ;;; Unsubscribe button clicked
                             ($click ($ ".podcast-subscribe-button")
-                                    (let ((unsubscribe-action (chain ($ this) (has-class "mdl-button--accent")))
+                                    (let ((unsubscribe-action (chain ($ this) (has-class "red")))
                                           (uuid (chain ($ this) (parent) (parent) (find "meta[name='podcast-id']") (attr "value"))))
                                       (if unsubscribe-action
                                           (unsubscribe-podcast uuid)
@@ -175,7 +176,7 @@
                                       ))
 
                             ;;; Checkbox event
-                            (chain ($ ".mdl-checkbox") (change
+                            (chain ($ "input[type=\"checkbox\"]") (change
                                                         (lambda ()
                                                           (event--checkbox-ticked))))))
 
@@ -184,16 +185,16 @@
                         (chain console (log "FAIL" errorMessage)))))
 
 (defun update-sub-button-state (subscribed uuid)
-  (loop for li in (chain ($ "#podcast-list") (find "li") (to-array)) do
+  (loop for li in (chain ($ "#podcast-list") (find ".row") (to-array)) do
        (let ((cur-uuid (chain ($ li) (find "meta[name='podcast-id']") (attr "value"))))
          (when (eq cur-uuid uuid)
            (if subscribed
                (progn
                  (chain ($ li) (find ".podcast-subscribe-button") (text "Unsubscribe"))
-                 (chain ($ li) (find ".podcast-subscribe-button") (add-class "mdl-button--accent")))
+                 (chain ($ li) (find ".podcast-subscribe-button") (add-class "red")))
                (progn
                  (chain ($ li) (find ".podcast-subscribe-button") (text "Subscribe"))
-                 (chain ($ li) (find ".podcast-subscribe-button") (remove-class "mdl-button--accent"))))
+                 (chain ($ li) (find ".podcast-subscribe-button") (remove-class "red"))))
            ))))
 
 (defun unsubscribe-podcast (uuid)
@@ -231,21 +232,22 @@
                ((@ local-storage "removeItem") "token")
                (adjust-visibility))
 
-       ($click ($ "#select-all-podcasts-container")
+       ($click ($ "#select-all-podcasts")
                (var is-checked
-                    (not (chain ($ this) (has-class "is-checked"))))
+                    (chain ($ this) (is ":checked")))
 
                (let ((podcasts (chain ($ "#podcast-list")
-                                      (find "li")
+                                      (find ".row")
                                       (to-array))))
 
                  (loop for podcast in podcasts do
                       (let ((podcast-checkbox
                              (chain ($ podcast)
-                                    (find "#podcast-checkbox-container"))))
+                                    (find "input[type=\"checkbox\"]"))))
                         (if is-checked
-                            (chain podcast-checkbox (add-class "is-checked"))
-                            (chain podcast-checkbox (remove-class "is-checked")))))))
+                            (chain podcast-checkbox (prop "checked" true))
+                            (chain podcast-checkbox (prop "checked" false)))))
+                 (adjust-visibility)))
 
        ($click ($ "#podcast-unsubscribe-selected-button")
                (loop for podcast in (get-selected-podcasts)
