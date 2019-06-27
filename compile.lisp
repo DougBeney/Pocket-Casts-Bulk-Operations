@@ -5,7 +5,7 @@
 
 (in-package :pocketcasts-batch)
 
-(with-open-file (stream "dist/script.js"
+(with-open-file (stream "docs/script.js"
                      :direction :output
                      :if-exists :supersede
                      :if-does-not-exist :create)

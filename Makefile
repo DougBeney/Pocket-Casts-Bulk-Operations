@@ -2,4 +2,4 @@ all:
 	sbcl --noinform --load compile.lisp
 
 livereload:
-	browser-sync dist/ --files "dist/index.html,dist/script.js"
+	browser-sync dist/ --files "docs/index.html,docs/script.js"
