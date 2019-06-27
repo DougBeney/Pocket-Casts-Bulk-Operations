@@ -107,12 +107,14 @@
   (if (@ local-storage token)
       (progn
         ($display ($ "#login-box") nil)
+        ($display ($ "#screenshot") nil)
         ($display ($ "#logout-button") t)
         ($display ($ "#podcast-list") t)
         ($display ($ "#bulk-header") t)
         ($display ($ "#header-sep") t))
       (progn
         ($display ($ "#login-box") t)
+        ($display ($ "#screenshot") t)
         ($display ($ "#logout-button") nil)
         ($display ($ "#podcast-list") nil)
         ($display ($ "#bulk-header") nil)
@@ -168,6 +170,7 @@
 
                             ;;; Unsubscribe button clicked
                             ($click ($ ".podcast-subscribe-button")
+                                    (chain console (log "hhh"))
                                     (let ((unsubscribe-action (chain ($ this) (has-class "red")))
                                           (uuid (chain ($ this) (parent) (parent) (find "meta[name='podcast-id']") (attr "value"))))
                                       (if unsubscribe-action

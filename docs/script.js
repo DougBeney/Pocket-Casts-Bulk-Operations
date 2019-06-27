@@ -67,41 +67,45 @@ function adjustVisibility() {
     if (localStorage.token) {
         var status = null ? 'inherit' : 'none';
         $('#login-box').css('display', status);
-        var status2 = true ? 'inherit' : 'none';
-        $('#logout-button').css('display', status2);
+        var status2 = null ? 'inherit' : 'none';
+        $('#screenshot').css('display', status2);
         var status3 = true ? 'inherit' : 'none';
-        $('#podcast-list').css('display', status3);
+        $('#logout-button').css('display', status3);
         var status4 = true ? 'inherit' : 'none';
-        $('#bulk-header').css('display', status4);
+        $('#podcast-list').css('display', status4);
         var status5 = true ? 'inherit' : 'none';
-        __PS_MV_REG = [];
-        return $('#header-sep').css('display', status5);
-    } else {
+        $('#bulk-header').css('display', status5);
         var status6 = true ? 'inherit' : 'none';
-        $('#login-box').css('display', status6);
-        var status7 = null ? 'inherit' : 'none';
-        $('#logout-button').css('display', status7);
-        var status8 = null ? 'inherit' : 'none';
-        $('#podcast-list').css('display', status8);
-        var status9 = null ? 'inherit' : 'none';
-        $('#bulk-header').css('display', status9);
-        var status10 = null ? 'inherit' : 'none';
         __PS_MV_REG = [];
-        return $('#header-sep').css('display', status10);
+        return $('#header-sep').css('display', status6);
+    } else {
+        var status7 = true ? 'inherit' : 'none';
+        $('#login-box').css('display', status7);
+        var status8 = true ? 'inherit' : 'none';
+        $('#screenshot').css('display', status8);
+        var status9 = null ? 'inherit' : 'none';
+        $('#logout-button').css('display', status9);
+        var status10 = null ? 'inherit' : 'none';
+        $('#podcast-list').css('display', status10);
+        var status11 = null ? 'inherit' : 'none';
+        $('#bulk-header').css('display', status11);
+        var status12 = null ? 'inherit' : 'none';
+        __PS_MV_REG = [];
+        return $('#header-sep').css('display', status12);
     };
 };
 function getSelectedPodcasts() {
     __PS_MV_REG = [];
     return (function () {
-        var _js11 = $('#podcast-list').find('input:checked').toArray();
-        var _js13 = _js11.length;
-        var collect14 = [];
-        for (var _js12 = 0; _js12 < _js13; _js12 += 1) {
-            var ticked = _js11[_js12];
-            collect14.push($(ticked).parent().parent());
+        var _js13 = $('#podcast-list').find('input:checked').toArray();
+        var _js15 = _js13.length;
+        var collect16 = [];
+        for (var _js14 = 0; _js14 < _js15; _js14 += 1) {
+            var ticked = _js13[_js14];
+            collect16.push($(ticked).parent().parent());
         };
         __PS_MV_REG = [];
-        return collect14;
+        return collect16;
     })();
 };
 function eventcheckboxTicked() {
@@ -110,20 +114,20 @@ function eventcheckboxTicked() {
     return podcastsChecked > 0 ? $('#mass-actions').css('opacity', '1') : $('#mass-actions').css('opacity', '0');
 };
 function apiRequest(url) {
-    var _js16 = arguments.length;
-    for (var n15 = 1; n15 < _js16; n15 += 2) {
-        switch (arguments[n15]) {
+    var _js18 = arguments.length;
+    for (var n17 = 1; n17 < _js18; n17 += 2) {
+        switch (arguments[n17]) {
         case 'method':
-            method = arguments[n15 + 1];
+            method = arguments[n17 + 1];
             break;
         case 'data':
-            data = arguments[n15 + 1];
+            data = arguments[n17 + 1];
             break;
         case 'success':
-            success = arguments[n15 + 1];
+            success = arguments[n17 + 1];
             break;
         case 'error':
-            error = arguments[n15 + 1];
+            error = arguments[n17 + 1];
         };
     };
     var method = 'undefined' === typeof method ? 'GET' : method;
@@ -153,16 +157,17 @@ function updatePodcasts() {
     clearPodcastsList();
     __PS_MV_REG = [];
     return apiRequest('https://api.pocketcasts.com/user/podcast/list', 'method', 'POST', 'success', function (data, status, xhr) {
-        var podcasts17 = data.podcasts;
-        YOURPODCASTS = podcasts17;
-        for (var i in podcasts17) {
-            var podcast = podcasts17[i];
-            var uuid18 = podcast.uuid;
+        var podcasts19 = data.podcasts;
+        YOURPODCASTS = podcasts19;
+        for (var i in podcasts19) {
+            var podcast = podcasts19[i];
+            var uuid20 = podcast.uuid;
             var name = podcast.title;
             var thumb = thumbnailUrl(podcast.uuid);
-            addPodcast(uuid18, name, thumb);
+            addPodcast(uuid20, name, thumb);
         };
         $('.podcast-subscribe-button').click(function () {
+            console.log('hhh');
             var unsubscribeAction = $(this).hasClass('red');
             var uuid = $(this).parent().parent().find('meta[name=\'podcast-id\']').attr('value');
             __PS_MV_REG = [];
@@ -178,10 +183,10 @@ function updatePodcasts() {
     });
 };
 function updateSubButtonState(subscribed, uuid) {
-    var _js18 = $('#podcast-list').find('.row').toArray();
-    var _js20 = _js18.length;
-    for (var _js19 = 0; _js19 < _js20; _js19 += 1) {
-        var li = _js18[_js19];
+    var _js20 = $('#podcast-list').find('.row').toArray();
+    var _js22 = _js20.length;
+    for (var _js21 = 0; _js21 < _js22; _js21 += 1) {
+        var li = _js20[_js21];
         var curUuid = $(li).find('meta[name=\'podcast-id\']').attr('value');
         if (curUuid === uuid) {
             if (subscribed) {
@@ -231,9 +236,9 @@ $(function () {
     $('#select-all-podcasts').click(function () {
         var isChecked = $(this).is(':checked');
         var podcasts = $('#podcast-list').find('.row').toArray();
-        var _js22 = podcasts.length;
-        for (var _js21 = 0; _js21 < _js22; _js21 += 1) {
-            var podcast = podcasts[_js21];
+        var _js24 = podcasts.length;
+        for (var _js23 = 0; _js23 < _js24; _js23 += 1) {
+            var podcast = podcasts[_js23];
             var podcastCheckbox = $(podcast).find('input[type=\"checkbox\"]');
             if (isChecked) {
                 podcastCheckbox.prop('checked', true);
@@ -245,19 +250,19 @@ $(function () {
         return adjustVisibility();
     });
     $('#podcast-unsubscribe-selected-button').click(function () {
-        var _js23 = getSelectedPodcasts();
-        var _js25 = _js23.length;
-        for (var _js24 = 0; _js24 < _js25; _js24 += 1) {
-            var podcast = _js23[_js24];
+        var _js25 = getSelectedPodcasts();
+        var _js27 = _js25.length;
+        for (var _js26 = 0; _js26 < _js27; _js26 += 1) {
+            var podcast = _js25[_js26];
             unsubscribePodcast($(podcast).find('meta[name=\'podcast-id\']').attr('value'));
         };
     });
     __PS_MV_REG = [];
     return $('#podcast-subscribe-selected-button').click(function () {
-        var _js26 = getSelectedPodcasts();
-        var _js28 = _js26.length;
-        for (var _js27 = 0; _js27 < _js28; _js27 += 1) {
-            var podcast = _js26[_js27];
+        var _js28 = getSelectedPodcasts();
+        var _js30 = _js28.length;
+        for (var _js29 = 0; _js29 < _js30; _js29 += 1) {
+            var podcast = _js28[_js29];
             subscribePodcast($(podcast).find('meta[name=\'podcast-id\']').attr('value'));
         };
     });

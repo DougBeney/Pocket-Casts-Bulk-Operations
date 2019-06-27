@@ -59,6 +59,11 @@
           background-color: #fff;
       }
 
+      img {
+          max-width: 100%;
+          height: auto;
+      }
+
       #header {
           background-color: #f43e37;
           color: #fff;
@@ -84,6 +89,17 @@
           min-height: 400px;
           max-width: 1000px;
           width: 100%;
+      }
+
+      #screenshot {
+          padding: 10px;
+          text-align: center;
+      }
+
+      #screenshot p {
+          margin: 3px;
+          text-transform: uppercase;
+          letter-spacing: 5px;
       }
 
       span#checkbox-span {
@@ -145,6 +161,25 @@
   </head>
   <body>
 
+    <templates style="display: none">
+      <div id="TEMPLATE_list-item">
+        <div class="row">
+          <meta name="podcast-id" value="-1"/>
+          <label>
+            <input class="filled-in" type="checkbox" id="podcast-checkbox" />
+            <span id="checkbox-span"></span>
+          </label>
+
+          <button class="podcast-subscribe-button unsub waves-effect waves-light btn red">
+            Unsubscribe
+          </button>
+
+          <img class="podcast-thumbnail material-icons  mdl-list__item-avatar" />
+          <span class="podcast-name">Podcast Name</span>
+        </div>
+      </div>
+    </templates>
+
     <div id="header">
       <div id="header-container">
         <h3>Pocket Casts Bulk Operations Tool</h3>
@@ -157,7 +192,7 @@
 
         <div id="login-box" class="mdl-card mdl-shadow--3dp" style="width: 100%">
 
-          <h3>Login to your PocketCasts.com account</h3>
+          <h3>Login with your PocketCasts.com account</h3>
 
           <p id="auth-error">Incorrect password!</p>
 
@@ -185,26 +220,12 @@
 
     <div id="document" class="z-depth-5">
 
-      <templates style="display: none">
-        <div id="TEMPLATE_list-item">
-          <div class="row">
-            <meta name="podcast-id" value="-1"/>
-            <label>
-              <input class="filled-in" type="checkbox" id="podcast-checkbox" />
-              <span id="checkbox-span"></span>
-            </label>
+      <div id="screenshot" class="z-depth-2">
+        <p>Screenshot</p>
+        <img alt="Screenshot of app" src="screenshot.png"/>
+      </div>
 
-            <button class="podcast-subscribe-button unsub waves-effect waves-light btn red">
-              Unsubscribe
-            </button>
-
-            <img class="podcast-thumbnail material-icons  mdl-list__item-avatar" />
-            <span class="podcast-name">Podcast Name</span>
-          </div>
-        </div>
-      </templates>
-
-      <div class="row" id="actions">
+      <div class="row" id="bulk-header">
         <label>
           <input class="filled-in" id="select-all-podcasts" type="checkbox" />
           <span id="checkbox-span"></span>
@@ -229,11 +250,33 @@
       </ul>
     </div>
 
+    <footer class="page-footer">
+      <div class="container">
+        <div class="row">
+          <div class="col l6 s12">
+            <h5 class="white-text">Open-Source</h5>
+            <p class="grey-text text-lighten-4">Code used in this project is 100% open-source under the <a style="color: #fff; text-decoration: underline;" href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPLv3</a> license.</p>
+          </div>
+          <div class="col l4 offset-l2 s12">
+            <h5 class="white-text">Links</h5>
+            <ul>
+              <li><a class="grey-text text-lighten-3" href="https://dougie.io/contact">Contact</a></li>
+              <li><a class="grey-text text-lighten-3" href="https://github.com/DougBeney/Pocket-Casts-Bulk-Operations">Source Code</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <div class="container">
+          dougie.io
+        </div>
+      </div>
+    </footer>
+
     <footer class="demo-footer mdl-mini-footer">
       <div class="mdl-mini-footer--left-section">
         <ul class="mdl-mini-footer--link-list">
-          <li><a href="https://dougie.io/contact">Contact</a></li>
-          <li><a href="https://github.com/DougBeney/Pocket-Casts-Bulk-Operations">Source Code</a></li>
+
         </ul>
       </div>
     </footer>
